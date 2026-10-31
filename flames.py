@@ -1,2 +1,0 @@
-groom = "Karuppasamy"
-bride = "abcdef"
