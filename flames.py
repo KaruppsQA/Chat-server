@@ -1,0 +1,2 @@
+groom = "Karuppasamy"
+bride = "abcdef"
