@@ -1,6 +1,7 @@
 import socket
 import select
 import sys
+import threading
 
 
 HOST = "127.0.0.1"
@@ -19,24 +20,26 @@ def broadcast(MESSAGE,user,all):
         if sock != user and sock != SERVER:
             sock.send(MESSAGE.encode())
 
+def client_handler(CLIENT):
+    while True:
+        MESSAGE = CLIENT.recv(MSG_BUFF)
+
+        if not MESSAGE:
+            SOCKETS.remove(CLIENT)
+            CLIENT.close()
+            break
+        MESSAGE = MESSAGE.decode()
+        print(MESSAGE)
+        broadcast(MESSAGE, CLIENT, SOCKETS)
+
+
 while True:
 
-    read,write,err = select.select(SOCKETS,[],[])
+    CLIENT,ADDR = SERVER.accept()
+    print("Someone connected !!!")
+    SOCKETS.append(CLIENT)
 
-    for sock in read:
-        if sock == SERVER:
-            CLIENT,ADDR = SERVER.accept()
-            print("Someone connected !!!")
-            SOCKETS.append(CLIENT)
-        else:
-            MESSAGE = sock.recv(MSG_BUFF)
-            if not MESSAGE:
-                SOCKETS.remove(sock)
-                sock.close()
-                print("Client disconnected")
-                continue
-            MESSAGE = MESSAGE.decode()
-            print(MESSAGE)
-            broadcast(MESSAGE,sock,SOCKETS)
+    client_thread = threading.Thread(target=client_handler,args=(CLIENT,))
+    client_thread.start()
 
 
