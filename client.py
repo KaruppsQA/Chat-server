@@ -15,6 +15,7 @@ CLIENTS.append(CLIENT)
 
 
 while True:
+    
     read,write,err = select.select(CLIENTS,[],[])
 
     if CLIENT in read:
